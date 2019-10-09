@@ -39,7 +39,7 @@ public class CalculatorViewController extends JPanel {
         //Create the mode/error button will be added to the top row "EAST"
         JButton modeError = createButton("F", "Error", Color.BLACK, Color.yellow, new Controller());
         modeError.setPreferredSize(new Dimension(52, 55));
-        modeError.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 0, Color.black));
+        modeError.setBorder(BorderFactory.createMatteBorder(0, 1, 0, 5, Color.black));
         topRow.add(modeError, BorderLayout.WEST); // add button to panel
 
         //add the display1 and display 2 into single panel then add to the topRow panel
@@ -56,7 +56,7 @@ public class CalculatorViewController extends JPanel {
         JButton backspace = createButton("\u21da", "\u21da", Color.BLACK, Color.yellow, new Controller());
         backspace.setPreferredSize(new Dimension(52, 55));
         backspace.setOpaque(false); //Make transparent
-        backspace.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 0, Color.black));
+        backspace.setBorder(BorderFactory.createMatteBorder(0, 5, 0, 1, Color.black));
         backspace.setToolTipText("Backspace Alt-B");
         backspace.setMnemonic(KeyEvent.VK_B);
         topRow.add(backspace, BorderLayout.EAST);
@@ -126,8 +126,8 @@ public class CalculatorViewController extends JPanel {
         JButton divide = createButton("\u2215", "\u2215", Color.BLACK, Color.CYAN, new Controller());
         multiply.setPreferredSize(new Dimension(48, 45));
         divide.setPreferredSize(new Dimension(48, 45));
-        multiply.setBorder(BorderFactory.createMatteBorder(0, 5, 0, 1, Color.black));
-        divide.setBorder(BorderFactory.createMatteBorder(0, 5, 0, 1, Color.black));
+        multiply.setBorder(BorderFactory.createMatteBorder(3, 0, 3, 5, Color.black));
+        divide.setBorder(BorderFactory.createMatteBorder(3, 0, 3, 5, Color.black));
         leftArithmetic.add(multiply, BorderLayout.NORTH);
         leftArithmetic.add(divide, BorderLayout.SOUTH);
         main.add(leftArithmetic, BorderLayout.WEST);
