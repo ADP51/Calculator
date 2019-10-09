@@ -31,8 +31,8 @@ public class CalculatorViewController extends JPanel {
         JPanel row2 = new JPanel(new BorderLayout()); // to be combined with topRow
         JPanel top = new JPanel(new BorderLayout()); // combine the top two rows into this panel
         JPanel main = new JPanel(new BorderLayout()); // the panel that will contain all of arithmetic buttons
-        JPanel leftArithmetic = new JPanel(new GridLayout(2, 1)); // multiply/divide buttons on the left of main
-        JPanel rightArithmetic = new JPanel(new GridLayout(2, 1)); // +/- buttons on right side of main
+        JPanel leftArithmetic = new JPanel(new GridLayout(2, 1,0,3)); // multiply/divide buttons on the left of main
+        JPanel rightArithmetic = new JPanel(new GridLayout(2, 1,0,3)); // +/- buttons on right side of main
         JPanel middleArithmetic = new JPanel(new BorderLayout()); // clear and numpad and equals will go inside of this
         JPanel numpad = new JPanel(new GridLayout(6, 3, 3, 3)); // the numpad for the this will go in middleArithmetic
 
@@ -50,12 +50,12 @@ public class CalculatorViewController extends JPanel {
         display2.setHorizontalAlignment(JTextField.RIGHT);
         display.add(display1, BorderLayout.CENTER);
         display.add(display2, BorderLayout.CENTER);
+        display.setBackground(Color.BLACK);
         topRow.add(display, BorderLayout.CENTER);
 
         //Create the backspace button and add it to the topRow Panel
-        JButton backspace = createButton("\u21da", "\u21da", Color.BLACK, Color.yellow, new Controller());
+        JButton backspace = createButton("\u21DA", "\u21DA", Color.BLACK, Color.yellow, new Controller());
         backspace.setPreferredSize(new Dimension(52, 55));
-        backspace.setOpaque(false); //Make transparent
         backspace.setBorder(BorderFactory.createMatteBorder(0, 5, 0, 1, Color.black));
         backspace.setToolTipText("Backspace Alt-B");
         backspace.setMnemonic(KeyEvent.VK_B);
@@ -63,19 +63,23 @@ public class CalculatorViewController extends JPanel {
 
         //Create the second row
         row2.setBackground(Color.BLACK);
+        row2.setBorder(BorderFactory.createMatteBorder(5,1,5,1, Color.BLACK));
 
         // Hexdecimal check box with attributes
-        JPanel hexButtonPanel = new JPanel();
         JCheckBox hexCheck = new JCheckBox("Hex");
+        hexCheck.setAlignmentX(Component.LEFT_ALIGNMENT);
         hexCheck.setBackground(Color.GREEN);
+        hexCheck.setBorder(BorderFactory.createMatteBorder(0, 1, 0, 5, Color.black));
         hexCheck.setOpaque(true);
         hexCheck.setActionCommand("Hex");
         hexCheck.addActionListener(new Controller());
-        hexCheck.setBorderPainted(false);
-        hexButtonPanel.add(hexCheck, BorderLayout.LINE_START);
+        JPanel hexBox = new JPanel(new GridLayout(1,1));
+        hexBox.add(hexCheck);
+        hexBox.setBorder(BorderFactory.createMatteBorder(5, 0, 5, 0, Color.black));
 
         //Setup radio buttons
         JPanel radio = new JPanel(new GridLayout(1, 3));
+        radio.setBorder(BorderFactory.createMatteBorder(5,0,5,0,Color.BLACK));
         JRadioButton radioButtonOne = new JRadioButton(".0", false);
         radioButtonOne.setBackground(Color.YELLOW);
         radioButtonOne.setOpaque(true);
@@ -112,9 +116,8 @@ public class CalculatorViewController extends JPanel {
         buttonGroup.add(sciRadioButton);
 
         //Create new panel for buttons
-        row2.add(hexButtonPanel, BorderLayout.LINE_START);
+        row2.add(hexBox, BorderLayout.LINE_START);
         row2.add(radio, BorderLayout.LINE_END);
-
 
         //add the top two rows together then add to the thisulator panel
         top.add(topRow, BorderLayout.NORTH);
@@ -126,10 +129,11 @@ public class CalculatorViewController extends JPanel {
         JButton divide = createButton("\u2215", "\u2215", Color.BLACK, Color.CYAN, new Controller());
         multiply.setPreferredSize(new Dimension(48, 45));
         divide.setPreferredSize(new Dimension(48, 45));
-        multiply.setBorder(BorderFactory.createMatteBorder(3, 0, 3, 5, Color.black));
-        divide.setBorder(BorderFactory.createMatteBorder(3, 0, 3, 5, Color.black));
-        leftArithmetic.add(multiply, BorderLayout.NORTH);
-        leftArithmetic.add(divide, BorderLayout.SOUTH);
+        multiply.setBorder(BorderFactory.createMatteBorder(0, 1, 0, 5, Color.black));
+        divide.setBorder(BorderFactory.createMatteBorder(0, 1, 0, 5, Color.black));
+        leftArithmetic.add(multiply);
+        leftArithmetic.add(divide);
+        leftArithmetic.setBackground(Color.BLACK);
         main.add(leftArithmetic, BorderLayout.WEST);
 
         //Create the right panel with the + and - buttons
@@ -137,25 +141,31 @@ public class CalculatorViewController extends JPanel {
         JButton minus = createButton("\u2212", "\u2212", Color.BLACK, Color.CYAN, new Controller());
         plus.setPreferredSize(new Dimension(48, 45));
         minus.setPreferredSize(new Dimension(48, 45));
-        plus.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 0, Color.black));
-        minus.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 0, Color.black));
-        rightArithmetic.add(plus, BorderLayout.NORTH);
-        rightArithmetic.add(minus, BorderLayout.SOUTH);
+        plus.setBorder(BorderFactory.createMatteBorder(0, 5, 0, 1, Color.black));
+        minus.setBorder(BorderFactory.createMatteBorder(0, 5, 0, 1, Color.black));
+        rightArithmetic.add(plus);
+        rightArithmetic.add(minus);
+        rightArithmetic.setBackground(Color.BLACK);
         main.add(rightArithmetic, BorderLayout.EAST);
 
         // Create the Clear button
         JButton clear = createButton("C", "C", Color.BLACK, Color.RED, new Controller());
+        clear.setPreferredSize(new Dimension(0,45));
         middleArithmetic.add(clear, BorderLayout.NORTH);
 
         // Create the equals button
         JButton equals = createButton("=", "=", Color.BLACK, Color.YELLOW, new Controller());
+        equals.setPreferredSize(new Dimension(0,45));
         middleArithmetic.add(equals, BorderLayout.SOUTH);
 
         // Create the hexButtons
         char hex = 'A';
         for (int i = 0; i < 6; i++) {
-            hex += i;
+            if(i > 0) {
+                hex += 1;
+            }
             hexButtons[i] = createButton(String.valueOf(hex), String.valueOf(hex), Color.BLACK, Color.BLUE, new Controller());
+            hexButtons[i].setEnabled(false);
             numpad.add(hexButtons[i]);
         }
 
@@ -166,9 +176,10 @@ public class CalculatorViewController extends JPanel {
 
         numpad.add(createButton(".", ".", Color.BLACK, Color.MAGENTA, new Controller()));
         numpad.add(createButton("0", "0", Color.BLACK, Color.BLUE, new Controller()));
-        numpad.add(createButton("\u00B1", "\u00B1", Color.BLACK, Color.BLUE, new Controller()));
+        numpad.add(createButton("\u00B1", "\u00B1", Color.BLACK, Color.MAGENTA, new Controller()));
         middleArithmetic.add(numpad, BorderLayout.CENTER);
         main.add(middleArithmetic, BorderLayout.CENTER);
+        main.setBackground(Color.BLACK);
         this.add(main, BorderLayout.CENTER);
     }
 
