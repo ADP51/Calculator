@@ -14,11 +14,11 @@ public class CalculatorSplashScreen extends JWindow {
      */
     private final int duration;
 
-    public CalculatorSplashScreen(int duration) {
+    protected CalculatorSplashScreen(int duration) {
         this.duration = duration;
     }
 
-    public void showSplashWindow() {
+    protected void showSplashWindow() {
         //create content pane
         JPanel content = new JPanel(new BorderLayout());
         // or use the window content pane
@@ -26,8 +26,8 @@ public class CalculatorSplashScreen extends JWindow {
         content.setBackground(Color.BLACK);
 
         // Set the window's bounds, position the window in the center of the screen
-        int width = 700 + 10;
-        int height = 900 + 10;
+        int width = 700;
+        int height = 500;
         Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
         int x = (screen.width - width) / 2;
         int y = (screen.height - height) / 2;
