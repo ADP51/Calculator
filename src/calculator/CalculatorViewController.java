@@ -169,7 +169,7 @@ public class CalculatorViewController extends JPanel {
         numpad.add(createButton("\u00B1", "\u00B1", Color.BLACK, Color.BLUE, new Controller()));
         middleArithmetic.add(numpad, BorderLayout.CENTER);
         main.add(middleArithmetic, BorderLayout.CENTER);
-        this.add(main, BorderLayout.SOUTH);
+        this.add(main, BorderLayout.CENTER);
     }
 
     /**
