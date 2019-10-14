@@ -15,6 +15,7 @@ public class CalculatorViewController extends JPanel {
     private JLabel error;
     private JButton dotButton;
     private JButton[] hexButtons = new JButton[6];
+    private int[] numpadNumbers = {7,8,9,4,5,6,1,2,3};
 
     /**
      * Constructor for CalculatorViewController creates a new panel
@@ -40,6 +41,8 @@ public class CalculatorViewController extends JPanel {
         JButton modeError = createButton("F", "Error", Color.BLACK, Color.yellow, new Controller());
         modeError.setPreferredSize(new Dimension(52, 55));
         modeError.setBorder(BorderFactory.createMatteBorder(0, 1, 0, 5, Color.black));
+        modeError.setOpaque(true);
+        modeError.setBorderPainted(false);
         topRow.add(modeError, BorderLayout.WEST); // add button to panel
 
         //add the display1 and display 2 into single panel then add to the topRow panel
@@ -59,6 +62,8 @@ public class CalculatorViewController extends JPanel {
         backspace.setBorder(BorderFactory.createMatteBorder(0, 5, 0, 1, Color.black));
         backspace.setToolTipText("Backspace Alt-B");
         backspace.setMnemonic(KeyEvent.VK_B);
+        backspace.setOpaque(true);
+        backspace.setBorderPainted(false);
         topRow.add(backspace, BorderLayout.EAST);
 
         //Create the second row
@@ -131,6 +136,11 @@ public class CalculatorViewController extends JPanel {
         divide.setPreferredSize(new Dimension(48, 45));
         multiply.setBorder(BorderFactory.createMatteBorder(0, 1, 0, 5, Color.black));
         divide.setBorder(BorderFactory.createMatteBorder(0, 1, 0, 5, Color.black));
+        multiply.setOpaque(true);
+        multiply.setBorderPainted(false);
+        divide.setOpaque(true);
+        multiply.setBorderPainted(false);
+        divide.setBorderPainted(false);
         leftArithmetic.add(multiply);
         leftArithmetic.add(divide);
         leftArithmetic.setBackground(Color.BLACK);
@@ -143,6 +153,10 @@ public class CalculatorViewController extends JPanel {
         minus.setPreferredSize(new Dimension(48, 45));
         plus.setBorder(BorderFactory.createMatteBorder(0, 5, 0, 1, Color.black));
         minus.setBorder(BorderFactory.createMatteBorder(0, 5, 0, 1, Color.black));
+        plus.setOpaque(true);
+        plus.setBorderPainted(false);
+        minus.setOpaque(true);
+        minus.setBorderPainted(false);
         rightArithmetic.add(plus);
         rightArithmetic.add(minus);
         rightArithmetic.setBackground(Color.BLACK);
@@ -151,11 +165,15 @@ public class CalculatorViewController extends JPanel {
         // Create the Clear button
         JButton clear = createButton("C", "C", Color.BLACK, Color.RED, new Controller());
         clear.setPreferredSize(new Dimension(0,45));
+        clear.setOpaque(true);
+        clear.setBorderPainted(false);
         middleArithmetic.add(clear, BorderLayout.NORTH);
 
         // Create the equals button
         JButton equals = createButton("=", "=", Color.BLACK, Color.YELLOW, new Controller());
         equals.setPreferredSize(new Dimension(0,45));
+        equals.setOpaque(true);
+        equals.setBorderPainted(false);
         middleArithmetic.add(equals, BorderLayout.SOUTH);
 
         // Create the hexButtons
@@ -166,17 +184,38 @@ public class CalculatorViewController extends JPanel {
             }
             hexButtons[i] = createButton(String.valueOf(hex), String.valueOf(hex), Color.BLACK, Color.BLUE, new Controller());
             hexButtons[i].setEnabled(false);
+            hexButtons[i].setOpaque(true);
+            hexButtons[i].setBorderPainted(false);
             numpad.add(hexButtons[i]);
         }
 
         // Create the number buttons
-        for (int i = 1; i < 10; i++) {
-            numpad.add(createButton(String.valueOf(i), String.valueOf(i), Color.BLACK, Color.BLUE, new Controller()));
+        for (int i = 0; i < 9; i++) {
+            JButton temp = createButton(String.valueOf(numpadNumbers[i]), String.valueOf(numpadNumbers[i]), Color.BLACK, Color.BLUE, new Controller());
+            temp.setBorderPainted(false);
+            temp.setOpaque(true);
+            numpad.add(temp);
         }
 
-        numpad.add(createButton(".", ".", Color.BLACK, Color.MAGENTA, new Controller()));
-        numpad.add(createButton("0", "0", Color.BLACK, Color.BLUE, new Controller()));
-        numpad.add(createButton("\u00B1", "\u00B1", Color.BLACK, Color.MAGENTA, new Controller()));
+        //set the dotButton
+        dotButton =  createButton(".", ".", Color.BLACK, Color.MAGENTA, new Controller());
+        dotButton.setOpaque(true);
+        dotButton.setBorderPainted(false);
+        numpad.add(dotButton);
+
+        // Sets the 0 button
+        JButton zeroButton = createButton("0", "0", Color.BLACK, Color.BLUE, new Controller());
+        zeroButton.setOpaque(true);
+        zeroButton.setBorderPainted(false);
+        numpad.add(zeroButton);
+
+        //Set the plus minus button
+        JButton plusMinus = createButton("\u00B1", "\u00B1", Color.BLACK, Color.MAGENTA, new Controller());
+        plusMinus.setOpaque(true);
+        plusMinus.setBorderPainted(false);
+        numpad.add(plusMinus);
+
+        // add the numpad to the middle arithmetic then add that to main panel
         middleArithmetic.add(numpad, BorderLayout.CENTER);
         main.add(middleArithmetic, BorderLayout.CENTER);
         main.setBackground(Color.BLACK);
