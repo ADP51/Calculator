@@ -1,3 +1,13 @@
+/*
+ * File name: CalculatorViewController
+ * Author: Andrew Palmer
+ * Course: CST8221 - JAP 302
+ * Assignment: 1
+ * Date: 2019-10-15
+ * Professor: Svillen Ranev
+ * Purpose: The controller and view class for calculator app
+ * Class List: CalculatorViewController, Controller
+ */
 package calculator;
 
 import javax.swing.*;
@@ -8,13 +18,39 @@ import java.awt.event.KeyEvent;
 
 /**
  * Author: Andrew Palmer
+ * Version: 1.0
+ * See: calculator
+ * Since: 1.8.222
  */
 public class CalculatorViewController extends JPanel {
+    /**
+     * The top half display
+     */
     private JTextField display1;
+
+    /**
+     * The bottom half of the display
+     */
     private JTextField display2;
+
+    /**
+     * The error label
+     */
     private JLabel error;
+
+    /**
+     * The . button on the calculator
+     */
     private JButton dotButton;
+
+    /**
+     * The array if hex value buttons
+     */
     private JButton[] hexButtons = new JButton[6];
+
+    /**
+     * Array of numbers for the numpad buttons
+     */
     private int[] numpadNumbers = {7,8,9,4,5,6,1,2,3};
 
     /**
@@ -42,7 +78,7 @@ public class CalculatorViewController extends JPanel {
         modeError.setPreferredSize(new Dimension(52, 55));
         modeError.setBorder(BorderFactory.createMatteBorder(0, 1, 0, 5, Color.black));
         modeError.setOpaque(true);
-        modeError.setBorderPainted(false);
+        modeError.setBorderPainted(true);
         topRow.add(modeError, BorderLayout.WEST); // add button to panel
 
         //add the display1 and display 2 into single panel then add to the topRow panel
@@ -54,6 +90,8 @@ public class CalculatorViewController extends JPanel {
         display2.setBorder(BorderFactory.createEmptyBorder());
         display2.setHorizontalAlignment(JTextField.RIGHT);
         display2.setHorizontalAlignment(JTextField.RIGHT);
+        display1.setEditable(false);
+        display2.setEditable(false);
         display.add(display1, BorderLayout.NORTH);
         display.add(display2, BorderLayout.SOUTH);
         display.setBackground(Color.BLACK);
@@ -67,7 +105,7 @@ public class CalculatorViewController extends JPanel {
         backspace.setToolTipText("Backspace Alt-B");
         backspace.setMnemonic(KeyEvent.VK_B);
         backspace.setOpaque(true);
-        backspace.setBorderPainted(false);
+        backspace.setBorderPainted(true);
         topRow.add(backspace, BorderLayout.EAST);
 
         //Create the second row
@@ -141,10 +179,11 @@ public class CalculatorViewController extends JPanel {
         multiply.setBorder(BorderFactory.createMatteBorder(0, 1, 0, 5, Color.black));
         divide.setBorder(BorderFactory.createMatteBorder(0, 1, 0, 5, Color.black));
         multiply.setOpaque(true);
-        multiply.setBorderPainted(false);
         divide.setOpaque(true);
-        multiply.setBorderPainted(false);
-        divide.setBorderPainted(false);
+        multiply.setBorderPainted(true);
+        divide.setBorderPainted(true);
+
+        //add buttons to leftArithmetic
         leftArithmetic.add(multiply);
         leftArithmetic.add(divide);
         leftArithmetic.setBackground(Color.BLACK);
@@ -158,9 +197,11 @@ public class CalculatorViewController extends JPanel {
         plus.setBorder(BorderFactory.createMatteBorder(0, 5, 0, 1, Color.black));
         minus.setBorder(BorderFactory.createMatteBorder(0, 5, 0, 1, Color.black));
         plus.setOpaque(true);
-        plus.setBorderPainted(false);
+        plus.setBorderPainted(true);
         minus.setOpaque(true);
-        minus.setBorderPainted(false);
+        minus.setBorderPainted(true);
+
+        //add buttons to rightArithmetic
         rightArithmetic.add(plus);
         rightArithmetic.add(minus);
         rightArithmetic.setBackground(Color.BLACK);
@@ -183,10 +224,10 @@ public class CalculatorViewController extends JPanel {
         middleArithmetic.add(equals, BorderLayout.SOUTH);
 
         // Create the hexButtons
-        char hex = 'A';
+        char hex = 'A'; // Letter value for hex buttons
         for (int i = 0; i < hexButtons.length; i++) {
             if(i > 0) {
-                hex += 1;
+                hex += 1; // increment the hex value for the next button
             }
             hexButtons[i] = createButton(String.valueOf(hex), String.valueOf(hex), Color.BLACK, Color.BLUE, new Controller());
             hexButtons[i].setEnabled(false);
@@ -195,7 +236,7 @@ public class CalculatorViewController extends JPanel {
             numpad.add(hexButtons[i]);
         }
 
-        // Create the number buttons
+        // Create the number buttons from the numpadNumbers array
         for (int i = 0; i < numpadNumbers.length; i++) {
             JButton temp = createButton(String.valueOf(numpadNumbers[i]), String.valueOf(numpadNumbers[i]), Color.BLACK, Color.BLUE, new Controller());
             temp.setBorderPainted(false);
@@ -221,13 +262,15 @@ public class CalculatorViewController extends JPanel {
         plusMinus.setBorderPainted(false);
         numpad.add(plusMinus);
 
+        //set the border for numpad
+        numpad.setBorder(BorderFactory.createMatteBorder(1,1,1,1,Color.WHITE));
+
         // add the numpad to the middle arithmetic then add that to main panel
         middleArithmetic.add(numpad, BorderLayout.CENTER);
-        middleArithmetic.setOpaque(true);
-        middleArithmetic.setBorder(BorderFactory.createMatteBorder(0,1,1,1,Color.BLACK));
+
         main.add(middleArithmetic, BorderLayout.CENTER);
         main.setBackground(Color.BLACK);
-        this.add(main, BorderLayout.CENTER);
+        this.add(main, BorderLayout.CENTER); // add the main panel to the class panel
     }
 
     /**
@@ -256,7 +299,10 @@ public class CalculatorViewController extends JPanel {
     }
 
     /**
-     * Private inner class to implement action listener for calculator
+     * Author: Andrew Palmer
+     * Version: 1.0
+     * See: calculator
+     * Since: 1.8.222
      */
     private class Controller implements ActionListener {
         @Override
