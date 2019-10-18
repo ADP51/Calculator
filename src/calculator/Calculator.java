@@ -28,6 +28,7 @@ public class Calculator {
                 JFrame frame = new JFrame("Calculator");
                 frame.setPreferredSize(new Dimension(380, 540));
                 frame.setContentPane(new CalculatorViewController());
+                frame.setLocationByPlatform(true);
                 frame.pack();
                 frame.setLocationRelativeTo(null);
                 frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

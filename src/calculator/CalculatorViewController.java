@@ -74,11 +74,12 @@ public class CalculatorViewController extends JPanel {
         JPanel numpad = new JPanel(new GridLayout(6, 3, 3, 3)); // the numpad for the this will go in middleArithmetic
 
         //Create the mode/error button will be added to the top row "EAST"
-        JButton modeError = createButton("F", "Error", Color.BLACK, Color.yellow, new Controller());
+        JButton modeError = createButton("F", "F", Color.BLACK, Color.yellow, new Controller());
         modeError.setPreferredSize(new Dimension(52, 55));
         modeError.setBorder(BorderFactory.createMatteBorder(0, 1, 0, 5, Color.black));
         modeError.setOpaque(true);
         modeError.setBorderPainted(true);
+        topRow.setBackground(Color.YELLOW); // set top row bg yellow per requirements
         topRow.add(modeError, BorderLayout.WEST); // add button to panel
 
         //add the display1 and display 2 into single panel then add to the topRow panel
@@ -94,17 +95,17 @@ public class CalculatorViewController extends JPanel {
         display2.setEditable(false);
         display.add(display1, BorderLayout.NORTH);
         display.add(display2, BorderLayout.SOUTH);
-        display.setBackground(Color.BLACK);
         display.setOpaque(true);
         topRow.add(display, BorderLayout.CENTER);
+        topRow.setBorder(BorderFactory.createMatteBorder(0,0,5,0, Color.BLACK));
 
         //Create the backspace button and add it to the topRow Panel
-        JButton backspace = createButton("\u21DA", "\u21DA", Color.BLACK, Color.yellow, new Controller());
+        JButton backspace = createButton("\u21DA", "\u21DA", Color.BLACK, Color.YELLOW, new Controller());
         backspace.setPreferredSize(new Dimension(52, 55));
         backspace.setBorder(BorderFactory.createMatteBorder(0, 5, 0, 1, Color.black));
         backspace.setToolTipText("Backspace Alt-B");
         backspace.setMnemonic(KeyEvent.VK_B);
-        backspace.setOpaque(true);
+        backspace.setOpaque(false);
         backspace.setBorderPainted(true);
         topRow.add(backspace, BorderLayout.EAST);
 
@@ -114,6 +115,7 @@ public class CalculatorViewController extends JPanel {
 
         // Hexdecimal check box with attributes
         JCheckBox hexCheck = new JCheckBox("Hex");
+        hexCheck.setPreferredSize(new Dimension(47,0));
         hexCheck.setAlignmentX(Component.LEFT_ALIGNMENT);
         hexCheck.setBackground(Color.GREEN);
         hexCheck.setBorder(BorderFactory.createMatteBorder(0, 1, 0, 5, Color.black));
@@ -163,6 +165,7 @@ public class CalculatorViewController extends JPanel {
         buttonGroup.add(sciRadioButton);
 
         //Create new panel for buttons
+        row2.setBorder(BorderFactory.createMatteBorder(0,0,0,0,Color.BLACK));
         row2.add(hexBox, BorderLayout.LINE_START);
         row2.add(radio, BorderLayout.LINE_END);
 
@@ -176,8 +179,8 @@ public class CalculatorViewController extends JPanel {
         JButton divide = createButton("\u2215", "\u2215", Color.BLACK, Color.CYAN, new Controller());
         multiply.setPreferredSize(new Dimension(48, 45));
         divide.setPreferredSize(new Dimension(48, 45));
-        multiply.setBorder(BorderFactory.createMatteBorder(0, 1, 0, 5, Color.black));
-        divide.setBorder(BorderFactory.createMatteBorder(0, 1, 0, 5, Color.black));
+        multiply.setBorder(BorderFactory.createMatteBorder(0, 1, 0, 1, Color.black));
+        divide.setBorder(BorderFactory.createMatteBorder(0, 1, 0, 1, Color.black));
         multiply.setOpaque(true);
         divide.setOpaque(true);
         multiply.setBorderPainted(true);
@@ -194,8 +197,8 @@ public class CalculatorViewController extends JPanel {
         JButton minus = createButton("\u2212", "\u2212", Color.BLACK, Color.CYAN, new Controller());
         plus.setPreferredSize(new Dimension(48, 45));
         minus.setPreferredSize(new Dimension(48, 45));
-        plus.setBorder(BorderFactory.createMatteBorder(0, 5, 0, 1, Color.black));
-        minus.setBorder(BorderFactory.createMatteBorder(0, 5, 0, 1, Color.black));
+        plus.setBorder(BorderFactory.createMatteBorder(0, 1, 0, 1, Color.black));
+        minus.setBorder(BorderFactory.createMatteBorder(0, 1, 0, 1, Color.black));
         plus.setOpaque(true);
         plus.setBorderPainted(true);
         minus.setOpaque(true);
@@ -212,13 +215,11 @@ public class CalculatorViewController extends JPanel {
         clear.setPreferredSize(new Dimension(0,45));
         clear.setOpaque(true);
         clear.setBorderPainted(false);
-        clear.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 0, Color.black));
         middleArithmetic.add(clear, BorderLayout.NORTH);
 
         // Create the equals button
         JButton equals = createButton("=", "=", Color.BLACK, Color.YELLOW, new Controller());
         equals.setPreferredSize(new Dimension(0,45));
-        equals.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 0, Color.black));
         equals.setOpaque(true);
         equals.setBorderPainted(false);
         middleArithmetic.add(equals, BorderLayout.SOUTH);
@@ -262,14 +263,17 @@ public class CalculatorViewController extends JPanel {
         plusMinus.setBorderPainted(false);
         numpad.add(plusMinus);
 
-        //set the border for numpad
-        numpad.setBorder(BorderFactory.createMatteBorder(1,1,1,1,Color.WHITE));
+        //set the border for numpad and set background
+        numpad.setBorder(BorderFactory.createMatteBorder(1,2,1,2,Color.WHITE));
+        numpad.setBackground(Color.WHITE);
 
         // add the numpad to the middle arithmetic then add that to main panel
         middleArithmetic.add(numpad, BorderLayout.CENTER);
+        middleArithmetic.setBorder(BorderFactory.createMatteBorder(0,4,0,4,Color.BLACK));
 
         main.add(middleArithmetic, BorderLayout.CENTER);
         main.setBackground(Color.BLACK);
+        main.setBorder(BorderFactory.createMatteBorder(5,0,0,0,Color.BLACK));
         this.add(main, BorderLayout.CENTER); // add the main panel to the class panel
     }
 
@@ -292,7 +296,7 @@ public class CalculatorViewController extends JPanel {
             button.setActionCommand(ac);
         }
 
-        button.setFont(new Font("Arial", Font.PLAIN, 20));
+        button.setFont(new Font("", Font.PLAIN, 20));
         button.addActionListener(handler);
 
         return button;
