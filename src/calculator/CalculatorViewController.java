@@ -23,6 +23,7 @@ import java.awt.event.KeyEvent;
  * Since: 1.8.222
  */
 public class CalculatorViewController extends JPanel {
+
     /**
      * The top half display
      */
@@ -61,6 +62,7 @@ public class CalculatorViewController extends JPanel {
         this.setLayout(new BorderLayout());
         this.setPreferredSize(new Dimension(380, 540)); //set the size of the application panel on screen
         this.setBorder(BorderFactory.createMatteBorder(5, 5, 5, 5, Color.black));
+        Controller controller = new Controller();
 
         // panels to be added to this
         JPanel topRow = new JPanel(new BorderLayout()); // To be combined with the row2
@@ -74,7 +76,7 @@ public class CalculatorViewController extends JPanel {
         JPanel numpad = new JPanel(new GridLayout(6, 3, 3, 3)); // the numpad for the this will go in middleArithmetic
 
         //Create the mode/error button will be added to the top row "EAST"
-        JButton modeError = createButton("F", "F", Color.BLACK, Color.yellow, new Controller());
+        JButton modeError = createButton("F", "F", Color.BLACK, Color.yellow, controller);
         modeError.setPreferredSize(new Dimension(52, 55));
         modeError.setBorder(BorderFactory.createMatteBorder(0, 1, 0, 5, Color.black));
         modeError.setOpaque(true);
@@ -89,7 +91,7 @@ public class CalculatorViewController extends JPanel {
         display2.setPreferredSize(new Dimension(0, 30));
         display1.setBorder(BorderFactory.createEmptyBorder());
         display2.setBorder(BorderFactory.createEmptyBorder());
-        display2.setHorizontalAlignment(JTextField.RIGHT);
+        display1.setHorizontalAlignment(JTextField.RIGHT);
         display2.setHorizontalAlignment(JTextField.RIGHT);
         display1.setEditable(false);
         display2.setEditable(false);
@@ -100,7 +102,7 @@ public class CalculatorViewController extends JPanel {
         topRow.setBorder(BorderFactory.createMatteBorder(0,0,5,0, Color.BLACK));
 
         //Create the backspace button and add it to the topRow Panel
-        JButton backspace = createButton("\u21DA", "\u21DA", Color.BLACK, Color.YELLOW, new Controller());
+        JButton backspace = createButton("\u21DA", "\u21DA", Color.BLACK, Color.YELLOW, controller);
         backspace.setPreferredSize(new Dimension(52, 55));
         backspace.setBorder(BorderFactory.createMatteBorder(0, 5, 0, 1, Color.black));
         backspace.setToolTipText("Backspace Alt-B");
@@ -121,7 +123,7 @@ public class CalculatorViewController extends JPanel {
         hexCheck.setBorder(BorderFactory.createMatteBorder(0, 1, 0, 5, Color.black));
         hexCheck.setOpaque(true);
         hexCheck.setActionCommand("Hex");
-        hexCheck.addActionListener(new Controller());
+        hexCheck.addActionListener(controller);
         JPanel hexBox = new JPanel(new GridLayout(1,1));
         hexBox.add(hexCheck);
         hexBox.setBorder(BorderFactory.createMatteBorder(5, 0, 5, 0, Color.black));
@@ -132,17 +134,15 @@ public class CalculatorViewController extends JPanel {
         JRadioButton radioButtonOne = new JRadioButton(".0", false);
         radioButtonOne.setBackground(Color.YELLOW);
         radioButtonOne.setOpaque(true);
-        radioButtonOne.setActionCommand("0.0");
+        radioButtonOne.setActionCommand("oneDecimal");
         radioButtonOne.setBorderPainted(false);
-        radioButtonOne.addActionListener(new Controller());
 
         // Selected at Default with attributes
         JRadioButton radioButtonTwo = new JRadioButton(".00", true);
         radioButtonTwo.setBackground(Color.YELLOW);
         radioButtonTwo.setOpaque(true);
         radioButtonTwo.setBorderPainted(false);
-        radioButtonTwo.setActionCommand("0.00");
-        radioButtonTwo.addActionListener(new Controller());
+        radioButtonTwo.setActionCommand("twoDecimal");
 
         // Sci not selected with attributes
         JRadioButton sciRadioButton = new JRadioButton("Sci", false);
@@ -150,7 +150,6 @@ public class CalculatorViewController extends JPanel {
         sciRadioButton.setOpaque(true);
         sciRadioButton.setActionCommand("Sci");
         sciRadioButton.setBorderPainted(false);
-        sciRadioButton.addActionListener(new Controller());
 
         //add the buttons to panel
         radio.add(radioButtonOne);
@@ -164,6 +163,11 @@ public class CalculatorViewController extends JPanel {
         buttonGroup.add(radioButtonTwo);
         buttonGroup.add(sciRadioButton);
 
+        //set the action listener for the radio buttons
+        radioButtonOne.addActionListener(controller);
+        radioButtonTwo.addActionListener(controller);
+        sciRadioButton.addActionListener(controller);
+
         //Create new panel for buttons
         row2.setBorder(BorderFactory.createMatteBorder(0,0,0,0,Color.BLACK));
         row2.add(hexBox, BorderLayout.LINE_START);
@@ -175,8 +179,8 @@ public class CalculatorViewController extends JPanel {
         this.add(top, BorderLayout.NORTH); // added to this
 
         // Creating the left panel with the * and / buttons
-        JButton multiply = createButton("\u002A", "\u002A", Color.BLACK, Color.CYAN, new Controller());
-        JButton divide = createButton("\u2215", "\u2215", Color.BLACK, Color.CYAN, new Controller());
+        JButton multiply = createButton("\u002A", "\u002A", Color.BLACK, Color.CYAN, controller);
+        JButton divide = createButton("\u2215", "\u2215", Color.BLACK, Color.CYAN, controller);
         multiply.setPreferredSize(new Dimension(48, 45));
         divide.setPreferredSize(new Dimension(48, 45));
         multiply.setBorder(BorderFactory.createMatteBorder(0, 1, 0, 1, Color.black));
@@ -193,8 +197,8 @@ public class CalculatorViewController extends JPanel {
         main.add(leftArithmetic, BorderLayout.WEST);
 
         //Create the right panel with the + and - buttons
-        JButton plus = createButton("\u002B", "\u002B", Color.BLACK, Color.CYAN, new Controller());
-        JButton minus = createButton("\u2212", "\u2212", Color.BLACK, Color.CYAN, new Controller());
+        JButton plus = createButton("\u002B", "\u002B", Color.BLACK, Color.CYAN, controller);
+        JButton minus = createButton("\u2212", "\u2212", Color.BLACK, Color.CYAN, controller);
         plus.setPreferredSize(new Dimension(48, 45));
         minus.setPreferredSize(new Dimension(48, 45));
         plus.setBorder(BorderFactory.createMatteBorder(0, 1, 0, 1, Color.black));
@@ -211,14 +215,14 @@ public class CalculatorViewController extends JPanel {
         main.add(rightArithmetic, BorderLayout.EAST);
 
         // Create the Clear button
-        JButton clear = createButton("C", "C", Color.BLACK, Color.RED, new Controller());
+        JButton clear = createButton("C", "C", Color.BLACK, Color.RED, controller);
         clear.setPreferredSize(new Dimension(0,45));
         clear.setOpaque(true);
         clear.setBorderPainted(false);
         middleArithmetic.add(clear, BorderLayout.NORTH);
 
         // Create the equals button
-        JButton equals = createButton("=", "=", Color.BLACK, Color.YELLOW, new Controller());
+        JButton equals = createButton("=", "=", Color.BLACK, Color.YELLOW, controller);
         equals.setPreferredSize(new Dimension(0,45));
         equals.setOpaque(true);
         equals.setBorderPainted(false);
@@ -226,11 +230,13 @@ public class CalculatorViewController extends JPanel {
 
         // Create the hexButtons
         char hex = 'A'; // Letter value for hex buttons
+        int hexValue = 10; // the numeric value
         for (int i = 0; i < hexButtons.length; i++) {
             if(i > 0) {
-                hex += 1; // increment the hex value for the next button
+                hex++; // increment the hex value for the next button
+                hexValue++; // increment the int value
             }
-            hexButtons[i] = createButton(String.valueOf(hex), String.valueOf(hex), Color.BLACK, Color.BLUE, new Controller());
+            hexButtons[i] = createButton(String.valueOf(hex), String.valueOf(hexValue), Color.BLACK, Color.BLUE, controller);
             hexButtons[i].setEnabled(false);
             hexButtons[i].setOpaque(true);
             hexButtons[i].setBorderPainted(false);
@@ -239,26 +245,26 @@ public class CalculatorViewController extends JPanel {
 
         // Create the number buttons from the numpadNumbers array
         for (int i = 0; i < numpadNumbers.length; i++) {
-            JButton temp = createButton(String.valueOf(numpadNumbers[i]), String.valueOf(numpadNumbers[i]), Color.BLACK, Color.BLUE, new Controller());
+            JButton temp = createButton(String.valueOf(numpadNumbers[i]), String.valueOf(numpadNumbers[i]), Color.BLACK, Color.BLUE, controller);
             temp.setBorderPainted(false);
             temp.setOpaque(true);
             numpad.add(temp);
         }
 
         //set the dotButton
-        dotButton =  createButton(".", ".", Color.BLACK, Color.MAGENTA, new Controller());
+        dotButton =  createButton(".", ".", Color.BLACK, Color.MAGENTA, controller);
         dotButton.setOpaque(true);
         dotButton.setBorderPainted(false);
         numpad.add(dotButton);
 
         // Sets the 0 button
-        JButton zeroButton = createButton("0", "0", Color.BLACK, Color.BLUE, new Controller());
+        JButton zeroButton = createButton("0", "0", Color.BLACK, Color.BLUE, controller);
         zeroButton.setOpaque(true);
         zeroButton.setBorderPainted(false);
         numpad.add(zeroButton);
 
         //Set the plus minus button
-        JButton plusMinus = createButton("\u00B1", "\u00B1", Color.BLACK, Color.MAGENTA, new Controller());
+        JButton plusMinus = createButton("\u00B1", "\u00B1", Color.BLACK, Color.MAGENTA, controller);
         plusMinus.setOpaque(true);
         plusMinus.setBorderPainted(false);
         numpad.add(plusMinus);
@@ -309,9 +315,132 @@ public class CalculatorViewController extends JPanel {
      * Since: 1.8.222
      */
     private class Controller implements ActionListener {
+
+        CalculatorModel calculatorModel; // the calculator model for the controller
+
+
+        public Controller(){
+            this.calculatorModel = new CalculatorModel(); // new model object
+        }
+
         @Override
         public void actionPerformed(ActionEvent e) {
-            display2.setText(e.getActionCommand());
+            boolean displayResult = false;
+            display1.setText(calculatorModel.getOperand1() + " " + calculatorModel.getArithmeticOperation() + " " + calculatorModel.getOperand2() + e.getActionCommand());
+
+            if (isNumeric(e.getActionCommand())) { //check to see if the action command is a operand input
+                if (calculatorModel.getOperandFlag() == CalculatorModel.OPERAND1_FLAG) { // check to see which operator to set
+                    calculatorModel.setOperand1(e.getActionCommand()); // set the first operand
+                } else {
+                    calculatorModel.setOperand2(e.getActionCommand()); //sets the second operand
+                }
+            } else if(isArithmeticOperator(e.getActionCommand())){ // check to see if the action was an arithmetic operator
+                calculatorModel.setArithmeticOperation(e.getActionCommand()); // set the operator
+            } else {
+                switch(e.getActionCommand()){
+                    case "F":
+                        calculatorModel.toggleMode();
+                        break;
+                    case "\u21DA":
+                        calculatorModel.removeLast();
+                        break;
+                    case "Hex":
+                        enableHexButtons();
+                        calculatorModel.setOperationalMode(CalculatorModel.INT_MODE); // set to integer calculations
+                        dotButton.setEnabled(false);
+                        break;
+                    case "oneDecimal":
+                        calculatorModel.setPrecisionMode(CalculatorModel.PRECISION_0);
+                        calculatorModel.setOperationalMode(CalculatorModel.FLOAT_MODE);
+                        disableHexButtons();
+                        dotButton.setEnabled(true);
+                        break;
+                    case "twoDecimal":
+                        calculatorModel.setPrecisionMode(CalculatorModel.PRECISION_00);
+                        calculatorModel.setOperationalMode(CalculatorModel.FLOAT_MODE);
+                        disableHexButtons();
+                        dotButton.setEnabled(true);
+                        break;
+                    case "Sci":
+                        calculatorModel.setPrecisionMode(CalculatorModel.PRECISION_E);
+                        calculatorModel.setOperationalMode(CalculatorModel.FLOAT_MODE);
+                        disableHexButtons();
+                        dotButton.setEnabled(true);
+                        break;
+                    case "C":
+                        display1.setText("");
+                        display2.setText("");
+                        calculatorModel.clear();
+                        break;
+                    case ".":
+                        if(calculatorModel.getOperandFlag() == CalculatorModel.OPERAND1_FLAG){
+                            calculatorModel.setOperand1(calculatorModel.getOperand1() + e.getActionCommand());
+                        } else {
+                            calculatorModel.setOperand2(calculatorModel.getOperand1() + e.getActionCommand());
+                        }
+                        break;
+                    case "\u00B1":
+                        calculatorModel.toggleSign();
+                        break;
+                    case "=":
+                        display2.setText(calculatorModel.getResult());
+                        display1.setText("");
+                        displayResult = true;
+                        break;
+                }
+            }
+
+            if(!displayResult) {
+                if (calculatorModel.isArithmeticOperatorSet()) {
+                    display2.setText(calculatorModel.getOperand2());
+                } else {
+                    display2.setText(calculatorModel.getOperand1());
+                }
+            }
+        }
+
+        /**
+         * A convenience method to check if the action command is a number
+         * @param value the string to check
+         * @return boolean value
+         */
+        private boolean isNumeric(String value) {
+            try{
+                double test = Double.parseDouble(value); // check if value can be parsed as a double
+            } catch(NumberFormatException e) {
+                return false;
+            }
+            return true;
+        }
+
+        /**
+         * Checks to see if the given string value is one of the accepted arithmetic operators
+         * @param value the value to check
+         * @return boolean value
+         */
+        private boolean isArithmeticOperator(String value) {
+            if ("\u002B".equals(value) || "\u2212".equals(value) || "\u002A".equals(value) || "\u2215".equals(value)) {
+                return true;
+            }
+            return false;
+        }
+
+        /**
+         *  Loops through the hexButtons and enables them
+         */
+        private void enableHexButtons() {
+            for(JButton button : hexButtons) {
+                button.setEnabled(true); // toggle the enabled value
+            }
+        }
+
+        /**
+         * Loops through the hexButtons and disables them
+         */
+        public void disableHexButtons() {
+            for(JButton button : hexButtons) {
+                button.setEnabled(false); // toggle the enabled value
+            }
         }
     }
 }
