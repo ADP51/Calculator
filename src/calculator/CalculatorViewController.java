@@ -24,6 +24,12 @@ import java.awt.event.KeyEvent;
  */
 public class CalculatorViewController extends JPanel {
 
+    public static String BACKSPACE_ARROW = "\u21DA";
+    public static String MULTIPLY_SYMBOL = "\u002A";
+    public static String DIVIDE_SYMBOL = "\u2215";
+    public static String PLUS_SYMBOL = "\u002B";
+    public static String MINUS_SYMBOL = "\u2212";
+
     /**
      * The top half display
      */
@@ -76,13 +82,14 @@ public class CalculatorViewController extends JPanel {
         JPanel numpad = new JPanel(new GridLayout(6, 3, 3, 3)); // the numpad for the this will go in middleArithmetic
 
         //Create the mode/error button will be added to the top row "EAST"
-        JButton modeError = createButton("F", "F", Color.BLACK, Color.yellow, controller);
-        modeError.setPreferredSize(new Dimension(52, 55));
-        modeError.setBorder(BorderFactory.createMatteBorder(0, 1, 0, 5, Color.black));
-        modeError.setOpaque(true);
-        modeError.setBorderPainted(true);
+        error = new JLabel("F", JLabel.CENTER);
+        error.setVerticalTextPosition(JLabel.CENTER);
+        error.setPreferredSize(new Dimension(52, 55));
+        error.setBorder(BorderFactory.createMatteBorder(0, 1, 0, 5, Color.black));
+        error.setOpaque(true);
+        error.setBackground(Color.YELLOW);
         topRow.setBackground(Color.YELLOW); // set top row bg yellow per requirements
-        topRow.add(modeError, BorderLayout.WEST); // add button to panel
+        topRow.add(error, BorderLayout.WEST); // add button to panel
 
         //add the display1 and display 2 into single panel then add to the topRow panel
         display1 = new JTextField("", 14);
@@ -215,7 +222,7 @@ public class CalculatorViewController extends JPanel {
         main.add(rightArithmetic, BorderLayout.EAST);
 
         // Create the Clear button
-        JButton clear = createButton("C", "C", Color.BLACK, Color.RED, controller);
+        JButton clear = createButton("C", "clear", Color.BLACK, Color.RED, controller);
         clear.setPreferredSize(new Dimension(0,45));
         clear.setOpaque(true);
         clear.setBorderPainted(false);
@@ -230,13 +237,11 @@ public class CalculatorViewController extends JPanel {
 
         // Create the hexButtons
         char hex = 'A'; // Letter value for hex buttons
-        int hexValue = 10; // the numeric value
         for (int i = 0; i < hexButtons.length; i++) {
             if(i > 0) {
                 hex++; // increment the hex value for the next button
-                hexValue++; // increment the int value
             }
-            hexButtons[i] = createButton(String.valueOf(hex), String.valueOf(hexValue), Color.BLACK, Color.BLUE, controller);
+            hexButtons[i] = createButton(String.valueOf(hex), String.valueOf(hex), Color.BLACK, Color.BLUE, controller);
             hexButtons[i].setEnabled(false);
             hexButtons[i].setOpaque(true);
             hexButtons[i].setBorderPainted(false);
@@ -316,8 +321,8 @@ public class CalculatorViewController extends JPanel {
      */
     private class Controller implements ActionListener {
 
-        CalculatorModel calculatorModel; // the calculator model for the controller
-
+        private CalculatorModel calculatorModel; // the calculator model for the controller
+        private boolean equalState = false; // a flag for controlling behaviour after the equal button is pressed
 
         public Controller(){
             this.calculatorModel = new CalculatorModel(); // new model object
@@ -325,17 +330,18 @@ public class CalculatorViewController extends JPanel {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            boolean displayResult = false;
-            display1.setText(calculatorModel.getOperand1() + " " + calculatorModel.getArithmeticOperation() + " " + calculatorModel.getOperand2() + e.getActionCommand());
-
+            checkEqualState(e.getActionCommand());
             if (isNumeric(e.getActionCommand())) { //check to see if the action command is a operand input
                 if (calculatorModel.getOperandFlag() == CalculatorModel.OPERAND1_FLAG) { // check to see which operator to set
                     calculatorModel.setOperand1(e.getActionCommand()); // set the first operand
+                    display2.setText(calculatorModel.getOperand1());
                 } else {
                     calculatorModel.setOperand2(e.getActionCommand()); //sets the second operand
+                    display2.setText(calculatorModel.getOperand2());
                 }
             } else if(isArithmeticOperator(e.getActionCommand())){ // check to see if the action was an arithmetic operator
                 calculatorModel.setArithmeticOperation(e.getActionCommand()); // set the operator
+                display1.setText(calculatorModel.getOperand1() + " " + calculatorModel.getArithmeticOperation());
             } else {
                 switch(e.getActionCommand()){
                     case "F":
@@ -343,58 +349,97 @@ public class CalculatorViewController extends JPanel {
                         break;
                     case "\u21DA":
                         calculatorModel.removeLast();
+                        if(calculatorModel.getOperandFlag() == CalculatorModel.OPERAND1_FLAG) {
+                            if (calculatorModel.getOperand1().isEmpty() || "-".equals(calculatorModel.getOperand1())) {
+                                display2.setText(calculatorModel.displayZero());
+                            } else {
+                                display2.setText(calculatorModel.getOperand1());
+                            }
+                        } else {
+                            if(calculatorModel.getOperand2().isEmpty() || "-".equals(calculatorModel.getOperand2())){
+                                display2.setText(calculatorModel.displayZero());
+                            } else {
+                                display2.setText(calculatorModel.getOperand2());
+                            }
+                        }
                         break;
                     case "Hex":
+                        calculatorModel.clear();
                         enableHexButtons();
                         calculatorModel.setOperationalMode(CalculatorModel.INT_MODE); // set to integer calculations
                         dotButton.setEnabled(false);
+                        error.setBackground(Color.GREEN);
+                        error.setText("H");
+                        display2.setText(calculatorModel.displayZero());
                         break;
                     case "oneDecimal":
+                        calculatorModel.clear();
                         calculatorModel.setPrecisionMode(CalculatorModel.PRECISION_0);
                         calculatorModel.setOperationalMode(CalculatorModel.FLOAT_MODE);
                         disableHexButtons();
                         dotButton.setEnabled(true);
+                        resetErrorLabel();
+                        display2.setText(calculatorModel.displayZero());
                         break;
                     case "twoDecimal":
+                        calculatorModel.clear();
                         calculatorModel.setPrecisionMode(CalculatorModel.PRECISION_00);
                         calculatorModel.setOperationalMode(CalculatorModel.FLOAT_MODE);
                         disableHexButtons();
                         dotButton.setEnabled(true);
+                        resetErrorLabel();
+                        display2.setText(calculatorModel.displayZero());
                         break;
                     case "Sci":
+                        calculatorModel.clear();
                         calculatorModel.setPrecisionMode(CalculatorModel.PRECISION_E);
                         calculatorModel.setOperationalMode(CalculatorModel.FLOAT_MODE);
                         disableHexButtons();
                         dotButton.setEnabled(true);
+                        resetErrorLabel();
+                        display2.setText(calculatorModel.displayZero());
                         break;
-                    case "C":
+                    case "clear":
                         display1.setText("");
-                        display2.setText("");
                         calculatorModel.clear();
+                        display2.setText(calculatorModel.displayZero());
                         break;
                     case ".":
                         if(calculatorModel.getOperandFlag() == CalculatorModel.OPERAND1_FLAG){
-                            calculatorModel.setOperand1(calculatorModel.getOperand1() + e.getActionCommand());
+                            calculatorModel.setOperand1(".");
+                            display2.setText(calculatorModel.getOperand1());
                         } else {
-                            calculatorModel.setOperand2(calculatorModel.getOperand1() + e.getActionCommand());
+                            calculatorModel.setOperand2(".");
+                            display2.setText(calculatorModel.getOperand2());
                         }
                         break;
                     case "\u00B1":
                         calculatorModel.toggleSign();
+                        if(calculatorModel.getOperandFlag() == CalculatorModel.OPERAND1_FLAG){
+                            if(calculatorModel.getOperand1().isEmpty()){
+                                display2.setText(calculatorModel.displayZero());
+                            }
+                            display2.setText(calculatorModel.getOperand1());
+                        } else {
+                            if(calculatorModel.getOperand2().isEmpty()){
+                                display2.setText(calculatorModel.displayZero());
+                            }
+                            display2.setText(calculatorModel.getOperand2());
+                        }
                         break;
                     case "=":
-                        display2.setText(calculatorModel.getResult());
+                        checkForShortcut();
+                        String result = calculatorModel.getResult();
+                        if(result != null) {
+                            display2.setText(result);
+                        } else {
+                            error.setBackground(Color.RED);
+                            error.setText("E");
+                            display2.setText(calculatorModel.getErrorMessage());
+                        }
                         display1.setText("");
-                        displayResult = true;
+                        equalState = true;
                         break;
-                }
-            }
-
-            if(!displayResult) {
-                if (calculatorModel.isArithmeticOperatorSet()) {
-                    display2.setText(calculatorModel.getOperand2());
-                } else {
-                    display2.setText(calculatorModel.getOperand1());
                 }
             }
         }
@@ -405,12 +450,7 @@ public class CalculatorViewController extends JPanel {
          * @return boolean value
          */
         private boolean isNumeric(String value) {
-            try{
-                double test = Double.parseDouble(value); // check if value can be parsed as a double
-            } catch(NumberFormatException e) {
-                return false;
-            }
-            return true;
+            return value.matches("-?[0-9a-fA-F]+");
         }
 
         /**
@@ -441,6 +481,46 @@ public class CalculatorViewController extends JPanel {
             for(JButton button : hexButtons) {
                 button.setEnabled(false); // toggle the enabled value
             }
+        }
+
+        public void resetErrorLabel() {
+            error.setBackground(Color.YELLOW);
+            error.setText("F");
+        }
+
+        /**
+         * Checks to see if the user has entered a shortcut and sets the second operand as the same as the first.
+         */
+        public void checkForShortcut() {
+            if(!calculatorModel.getOperand1().isEmpty() && !calculatorModel.getArithmeticOperation().isEmpty() && calculatorModel.getOperand2().isEmpty()) {
+                calculatorModel.setOperand2(calculatorModel.getOperand1());
+            }
+        }
+
+        /**
+         * This method will check for the next performed action after the = action was performed and will allow the user to
+         * begin a new calculation without pressing the clear button.
+         * @param actionEvent the ActionEvent
+         */
+        public void checkEqualState(String actionEvent) {
+            if (this.equalState) {
+                if (isNumeric(actionEvent)) { // check to see if actionEvent is numeric and clear the calculator model if it is
+                    calculatorModel.clear();
+                } else if(isArithmeticOperator(actionEvent)){
+                    calculatorModel.clearOperand2();
+                }
+            }
+            equalState = false;
+        }
+
+        public void errorDisable() {
+            //if calculator is in hex mode disable hex buttons
+            if(calculatorModel.getOperationalMode() == calculatorModel.INT_MODE) {
+                for(JButton button : hexButtons) {
+                    button.setEnabled(false);
+                }
+            }
+
         }
     }
 }

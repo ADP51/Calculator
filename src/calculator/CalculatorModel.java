@@ -25,83 +25,19 @@ public class CalculatorModel {
     public final static int OPERAND1_FLAG = 0;
     public final static int OPERAND2_FLAG = 1;
 
-    private String[] formatModes = {"%.1f", "%.2f", "%E"};
-    private String operand1 = "";
-    private String operand2 = "";
-    private String arithmeticOperation = "";
-    private int operationalMode = FLOAT_MODE;
-    private int precisionMode = PRECISION_00;
-    private boolean errorState;
-    private String errorMessage;
+    private String[] formatModes = {"%.1f", "%.2f", "%E"}; // String formats for different precision modes
+    private String operand1 = ""; // the first operand
+    private String operand2 = ""; // the second operand
+    private String arithmeticOperation = ""; // the arithmetic operator +,-.*,/
+    private int operationalMode = FLOAT_MODE; // float mode or Hex mode
+    private int precisionMode = PRECISION_00; // how many decimals does the output need to be
+    private boolean errorState = false; // error state
+    private String errorMessage = ""; // information on the error
     private int operandFlag = 0; // flag to check what operand to assign
 
     /**
-     * Gets the first operand
-     * @return the operand
-     */
-    public String getOperand1() {
-        return this.operand1;
-    }
-    /**
-     * Set the first operand
-     * @param operand the operand value
-     */
-    public void setOperand1(String operand) {
-        this.operand1 += operand;
-    }
-
-    /**
-     * Gets the second operand
-     * @return the operand
-     */
-    public String getOperand2() {
-        return this.operand2;
-    }
-
-    /**
-     * Set the second operand
-     * @param operand the operand value
-     */
-    public void setOperand2(String operand) {
-        this.operand2 += operand;
-    }
-
-    /**
-     * Gets the arithmetic operator
-     * @return the arithmetic operator
-     */
-    public String getArithmeticOperation() {
-        return this.arithmeticOperation;
-    }
-
-    /**
-     * Set the arithmetic operator
-     * @param operation the arithmetic operator
-     */
-    public void setArithmeticOperation(String operation) {
-        this.arithmeticOperation = operation;
-        operandFlag = OPERAND2_FLAG;
-    }
-
-    /**
-     * Set the operational mode (float/integer)
-     * @param mode the integer value representing the mode 0/1
-     */
-    public void setOperationalMode(int mode){
-        this.operationalMode = mode;
-    }
-
-    /**
-     * Calls the calculate method and returns the result
-     * @return the result of the mathematical operation
-     */
-    public String getResult() {
-        return calculate();
-    }
-
-    /**
      * Depending on the operational mode
-     * @return
+     * @return the result of the input equation
      */
     private String calculate(){
         if (operationalMode == INT_MODE)  {
@@ -116,36 +52,53 @@ public class CalculatorModel {
         int op2 = 0;
 
         try {
-            op1 = Integer.parseInt(operand1);
-            op2 = Integer.parseInt(operand2);
+            op1 = Integer.parseInt(operand1, 16);
+            op2 = Integer.parseInt(operand2, 16);
         } catch(NumberFormatException e) {
             this.errorState = true;
+            this.errorMessage = "Unrecognized operand.";
             return null;
         }
 
-        if(op1 == 0 && op2 == 0 && "/".equals(arithmeticOperation)) {
+        if(op1 == 0 &&  "/".equals(arithmeticOperation)) {
+            this.operand1 = "";
+            this.operand2 = "";
             this.errorState = true;
             this.errorMessage = "Result is undefined.";
             return null;
         }
 
         if(op2 == 0 && "/".equals(arithmeticOperation)) {
+            this.operand1 = "";
+            this.operand2 = "";
             this.errorState = true;
             this.errorMessage = "Cannot divide by zero.";
             return null;
         }
 
-        switch (arithmeticOperation) {
-            case "\u002B":
-                return String.format("%d", op1 + op2);
-            case "\u2212":
-                return String.format("%d", op1 - op2);
-            case "\u002A":
-                return String.format("%d", op1 * op2);
-            case "\u2215":
-                return String.format("%d", op1 / op2);
-            default:
-                return "error";
+        try {
+            switch (arithmeticOperation) {
+                case "\u002B":
+                    operand1 = Integer.toHexString(op1+op2).toUpperCase();
+                    return operand1;
+                case "\u2212":
+                    operand1 = Integer.toHexString(op1 - op2).toUpperCase();
+                    return operand1;
+                case "\u002A":
+                    operand1 = Integer.toHexString(op1 * op2).toUpperCase();
+                    return operand1;
+                case "\u2215":
+                    operand1 = Integer.toHexString(op1 / op2).toUpperCase();
+                    return operand1;
+                default:
+                    this.errorState = true;
+                    this.errorMessage = "Illegal arithmetic operator.";
+                    return null;
+            }
+        } catch (ArithmeticException e) {
+            this.errorState = true;
+            this.errorMessage = "Unknown error";
+            return null;
         }
     }
 
@@ -163,35 +116,45 @@ public class CalculatorModel {
             return null;
         }
 
-        if(op1 == 0.0 && op2 == 0.0 && "/".equals(arithmeticOperation)) {
+        if(op1 == 0.0 && CalculatorViewController.DIVIDE_SYMBOL.equals(arithmeticOperation)) {
+            this.operand1 = "";
+            this.operand2 = "";
             this.errorState = true;
             this.errorMessage = "Result is undefined.";
             return null;
         }
 
-        if(op2 == 0.0 && "/".equals(arithmeticOperation)) {
+        if(op2 == 0.0 && CalculatorViewController.DIVIDE_SYMBOL.equals(arithmeticOperation)) {
+            this.operand1 = "";
+            this.operand2 = "";
             this.errorState = true;
             this.errorMessage = "Cannot divide by zero.";
             return null;
         }
 
-        switch (arithmeticOperation) {
-            case "\u002B":
-                result = op1 + op2;
-                return String.format(formatModes[precisionMode], result);
-            case "\u2212":
-                result = op1 - op2;
-                return String.format(formatModes[precisionMode], result);
-            case "\u002A":
-                result = op1 * op2;
-                return String.format(formatModes[precisionMode], result);
-            case "\u2215":
-                result = op1 / op2;
-                return String.format(formatModes[precisionMode], result);
-            default:
-                this.errorState = true;
-                this.errorMessage = "Illegal arithmetic operator.";
-                return null;
+        try {
+            switch (arithmeticOperation) {
+                case "\u002B":
+                    operand1 = String.format(formatModes[precisionMode], op1 + op2);
+                    return operand1;
+                case "\u2212":
+                    operand1 = String.format(formatModes[precisionMode], op1 - op2);
+                    return operand1;
+                case "\u002A":
+                    operand1 = String.format(formatModes[precisionMode], op1 * op2);
+                    return operand1;
+                case "\u2215":
+                    operand1 = String.format(formatModes[precisionMode], op1 / op2);
+                    return operand1;
+                default:
+                    this.errorState = true;
+                    this.errorMessage = "Illegal arithmetic operator.";
+                    return null;
+            }
+        } catch (ArithmeticException e) {
+            this.errorState = true;
+            this.errorMessage = "Unknown error";
+            return null;
         }
     }
 
@@ -235,12 +198,18 @@ public class CalculatorModel {
      */
     public void removeLast() {
         if (operandFlag == OPERAND1_FLAG) { // check if the first operand is set
-            this.operand1 = operand1.substring(0, operand1.length()-1); // pop the last char off the string
+            if(!operand1.isEmpty()) {
+                this.operand1 = operand1.substring(0, operand1.length() - 1); // pop the last char off the string
+                if ("-".equals(this.operand1)) {
+                    this.operand1 = ""; // if all numbers are deleted and only a negative sign remains then reset to 0
+                }
+            }
         } else {
             if (operand2.isEmpty()) { // if the first operand is set but there is nothing added to the second remove the arithmetic operator
                 this.arithmeticOperation = "";
             } else {
                 this.operand2 = operand2.substring(0, operand2.length()-1); // pop the last char off the string
+                this.operand2 = "";
             }
         }
     }
@@ -249,8 +218,8 @@ public class CalculatorModel {
      * Clears the current operation and resets all the appropriate fields
      */
     public void clear() {
-        operand1 = String.format(formatModes[precisionMode],"0");
-        operand2 = String.format(formatModes[precisionMode],"0");;
+        operand1 = "";
+        operand2 = "";
         arithmeticOperation = "";
         operandFlag = OPERAND1_FLAG;
     }
@@ -275,13 +244,105 @@ public class CalculatorModel {
     }
 
     /**
-     * Checks to see if the operand2 has been set
-     * @return true/false
+     * A method to display zero in the proper format when required.
+     * @return Formatted String of 0
      */
-    public boolean isArithmeticOperatorSet() {
-        if (arithmeticOperation.isEmpty()) {
-            return false;
+    public String displayZero() {
+        String zeroFormatted;
+        if(operationalMode == INT_MODE){
+            zeroFormatted = String.format("%d", 0);
+        } else {
+            zeroFormatted = String.format(formatModes[precisionMode], 0.0);
         }
-        return true;
+        return zeroFormatted; // zero value formatted
+    }
+
+    /**
+     * Gets the first operand
+     * @return the operand
+     */
+    public String getOperand1() {
+        return this.operand1;
+    }
+    /**
+     * Set the first operand
+     * @param operand the operand value
+     */
+    public void setOperand1(String operand) {
+        if("0".equals(this.operand1)){
+            operand1 = "";
+        }
+        this.operand1 += operand;
+    }
+
+    /**
+     * Gets the second operand
+     * @return the operand
+     */
+    public String getOperand2() {
+        return this.operand2;
+    }
+
+    /**
+     * Set the second operand
+     * @param operand the operand value
+     */
+    public void setOperand2(String operand) {
+        if("0".equals(this.operand2)){
+            operand2 = "";
+        }
+        this.operand2 += operand;
+    }
+
+    /**
+     * Gets the arithmetic operator
+     * @return the arithmetic operator
+     */
+    public String getArithmeticOperation() {
+        return this.arithmeticOperation;
+    }
+
+    /**
+     * Set the arithmetic operator
+     * @param operation the arithmetic operator
+     */
+    public void setArithmeticOperation(String operation) {
+        this.arithmeticOperation = operation;
+        operandFlag = OPERAND2_FLAG;
+    }
+
+    /**
+     * Set the operational mode (float/integer)
+     * @param mode the integer value representing the mode 0/1
+     */
+    public void setOperationalMode(int mode){
+        this.operationalMode = mode;
+    }
+
+    /**
+     * Calls the calculate method and returns the result
+     * @return the result of the mathematical operation
+     */
+    public String getResult() {
+        return calculate();
+    }
+
+    /**
+     * Returns the error message
+     * @return errorMessage
+     */
+    public String getErrorMessage() {
+        return errorMessage;
+    }
+
+    /**
+     * Clears the operand2 field
+     */
+    public void clearOperand2() {
+        this.operand2 = "";
+    }
+
+    public int getOperationalMode() {
+        return this.operationalMode;
     }
 }
