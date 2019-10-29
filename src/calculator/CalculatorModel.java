@@ -36,8 +36,8 @@ public class CalculatorModel {
     private int operandFlag = 0; // flag to check what operand to assign
 
     /**
-     * Depending on the operational mode
-     * @return the result of the input equation
+     * Calls the appropriate calculate method depending on the operational mode
+     * @return the result of the called method
      */
     private String calculate(){
         if (operationalMode == INT_MODE)  {
@@ -66,6 +66,7 @@ public class CalculatorModel {
             return null;
         }
 
+        // Error checking
         if(op1 == 0 &&  "/".equals(arithmeticOperation)) {
             this.operand1 = "";
             this.operand2 = "";
@@ -74,6 +75,7 @@ public class CalculatorModel {
             return null;
         }
 
+        //Error checking
         if(op2 == 0 && "/".equals(arithmeticOperation)) {
             this.operand1 = "";
             this.operand2 = "";
@@ -133,6 +135,7 @@ public class CalculatorModel {
             return null;
         }
 
+        //Error checking
         if(op1 == 0.0 && CalculatorViewController.DIVIDE_SYMBOL.equals(arithmeticOperation)) {
             this.operand1 = "";
             this.operand2 = "";
@@ -141,6 +144,7 @@ public class CalculatorModel {
             return null;
         }
 
+        //error checking
         if(op2 == 0.0 && CalculatorViewController.DIVIDE_SYMBOL.equals(arithmeticOperation)) {
             this.operand1 = "";
             this.operand2 = "";
