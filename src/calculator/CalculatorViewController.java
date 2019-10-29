@@ -24,11 +24,11 @@ import java.awt.event.KeyEvent;
  */
 public class CalculatorViewController extends JPanel {
 
-    public static String BACKSPACE_ARROW = "\u21DA";
-    public static String MULTIPLY_SYMBOL = "\u002A";
-    public static String DIVIDE_SYMBOL = "\u2215";
-    public static String PLUS_SYMBOL = "\u002B";
-    public static String MINUS_SYMBOL = "\u2212";
+    public static final String BACKSPACE_ARROW = "\u21DA";
+    public static final String MULTIPLY_SYMBOL = "\u002A";
+    public static final String DIVIDE_SYMBOL = "\u2215";
+    public static final String PLUS_SYMBOL = "\u002B";
+    public static final String MINUS_SYMBOL = "\u2212";
 
     /**
      * The top half display
@@ -109,7 +109,7 @@ public class CalculatorViewController extends JPanel {
         topRow.setBorder(BorderFactory.createMatteBorder(0,0,5,0, Color.BLACK));
 
         //Create the backspace button and add it to the topRow Panel
-        JButton backspace = createButton("\u21DA", "\u21DA", Color.BLACK, Color.YELLOW, controller);
+        JButton backspace = createButton(BACKSPACE_ARROW, BACKSPACE_ARROW, Color.BLACK, Color.YELLOW, controller);
         backspace.setPreferredSize(new Dimension(52, 55));
         backspace.setBorder(BorderFactory.createMatteBorder(0, 5, 0, 1, Color.black));
         backspace.setToolTipText("Backspace Alt-B");
@@ -186,8 +186,8 @@ public class CalculatorViewController extends JPanel {
         this.add(top, BorderLayout.NORTH); // added to this
 
         // Creating the left panel with the * and / buttons
-        JButton multiply = createButton("\u002A", "\u002A", Color.BLACK, Color.CYAN, controller);
-        JButton divide = createButton("\u2215", "\u2215", Color.BLACK, Color.CYAN, controller);
+        JButton multiply = createButton(MULTIPLY_SYMBOL, MULTIPLY_SYMBOL, Color.BLACK, Color.CYAN, controller);
+        JButton divide = createButton(DIVIDE_SYMBOL, DIVIDE_SYMBOL, Color.BLACK, Color.CYAN, controller);
         multiply.setPreferredSize(new Dimension(48, 45));
         divide.setPreferredSize(new Dimension(48, 45));
         multiply.setBorder(BorderFactory.createMatteBorder(0, 1, 0, 1, Color.black));
@@ -204,8 +204,8 @@ public class CalculatorViewController extends JPanel {
         main.add(leftArithmetic, BorderLayout.WEST);
 
         //Create the right panel with the + and - buttons
-        JButton plus = createButton("\u002B", "\u002B", Color.BLACK, Color.CYAN, controller);
-        JButton minus = createButton("\u2212", "\u2212", Color.BLACK, Color.CYAN, controller);
+        JButton plus = createButton(PLUS_SYMBOL, PLUS_SYMBOL, Color.BLACK, Color.CYAN, controller);
+        JButton minus = createButton(MINUS_SYMBOL, MINUS_SYMBOL, Color.BLACK, Color.CYAN, controller);
         plus.setPreferredSize(new Dimension(48, 45));
         minus.setPreferredSize(new Dimension(48, 45));
         plus.setBorder(BorderFactory.createMatteBorder(0, 1, 0, 1, Color.black));
@@ -328,118 +328,152 @@ public class CalculatorViewController extends JPanel {
             this.calculatorModel = new CalculatorModel(); // new model object
         }
 
+        /**
+         * Gets the ActionEvent and defines the behaviour for each action command. Checks for any error state and requires
+         * the correct buttons to be clicked to clear the error.
+         * @param e the ActionEvent (button pressed)
+         */
         @Override
         public void actionPerformed(ActionEvent e) {
-            checkEqualState(e.getActionCommand());
-            if (isNumeric(e.getActionCommand())) { //check to see if the action command is a operand input
-                if (calculatorModel.getOperandFlag() == CalculatorModel.OPERAND1_FLAG) { // check to see which operator to set
-                    calculatorModel.setOperand1(e.getActionCommand()); // set the first operand
-                    display2.setText(calculatorModel.getOperand1());
-                } else {
-                    calculatorModel.setOperand2(e.getActionCommand()); //sets the second operand
-                    display2.setText(calculatorModel.getOperand2());
-                }
-            } else if(isArithmeticOperator(e.getActionCommand())){ // check to see if the action was an arithmetic operator
-                calculatorModel.setArithmeticOperation(e.getActionCommand()); // set the operator
-                display1.setText(calculatorModel.getOperand1() + " " + calculatorModel.getArithmeticOperation());
-            } else {
-                switch(e.getActionCommand()){
-                    case "F":
-                        calculatorModel.toggleMode();
-                        break;
-                    case "\u21DA":
-                        calculatorModel.removeLast();
-                        if(calculatorModel.getOperandFlag() == CalculatorModel.OPERAND1_FLAG) {
-                            if (calculatorModel.getOperand1().isEmpty() || "-".equals(calculatorModel.getOperand1())) {
-                                display2.setText(calculatorModel.displayZero());
-                            } else {
-                                display2.setText(calculatorModel.getOperand1());
+
+            resetError(e.getActionCommand()); // resets the error state
+
+            if(!calculatorModel.getErrorState()) { // check to see if there is an error that needs to be cleared
+
+                checkEqualState(e.getActionCommand()); // checks if the equal operation was just performed and defines behaviour for the next input
+
+                if (isNumeric(e.getActionCommand())) { //check to see if the action command is a operand input
+
+                    if (calculatorModel.getOperandFlag() == CalculatorModel.OPERAND1_FLAG) { // check to see which operator to set
+                        calculatorModel.setOperand1(e.getActionCommand()); // set the first operand
+                        display2.setText(calculatorModel.getOperand1());
+                    } else {
+                        calculatorModel.setOperand2(e.getActionCommand()); //sets the second operand
+                        display2.setText(calculatorModel.getOperand2());
+                    }
+
+                } else if (isArithmeticOperator(e.getActionCommand())) { // check to see if the action was an arithmetic operator
+                    calculatorModel.setArithmeticOperation(e.getActionCommand()); // set the operator
+                    display1.setText(calculatorModel.getOperand1() + " " + calculatorModel.getArithmeticOperation());
+
+                } else { // if the action command is not a number or a arithmetic operator
+
+                    switch (e.getActionCommand()) {
+
+                        case "F":
+                            calculatorModel.toggleMode();
+                            break;
+
+                        case BACKSPACE_ARROW:
+
+                            calculatorModel.removeLast();
+
+                            if (calculatorModel.getOperandFlag() == CalculatorModel.OPERAND1_FLAG) { // check to see what operand is currently being used
+                                if (calculatorModel.getOperand1().isEmpty() || "-".equals(calculatorModel.getOperand1())) {
+                                    display2.setText(calculatorModel.displayZero()); // if the operand is empty or - then just display 0
+                                } else {
+                                    display2.setText(calculatorModel.getOperand1()); // display the current operand
+                                }
+                            } else { // do the same for operand2
+                                if (calculatorModel.getOperand2().isEmpty() || "-".equals(calculatorModel.getOperand2())) {
+                                    display2.setText(calculatorModel.displayZero());
+                                } else {
+                                    display2.setText(calculatorModel.getOperand2());
+                                }
                             }
-                        } else {
-                            if(calculatorModel.getOperand2().isEmpty() || "-".equals(calculatorModel.getOperand2())){
-                                display2.setText(calculatorModel.displayZero());
+                            break;
+
+                        case "Hex":
+                            calculatorModel.clear();
+                            enableHexButtons();
+                            calculatorModel.setOperationalMode(CalculatorModel.INT_MODE); // set to integer calculations
+                            dotButton.setEnabled(false);
+                            error.setBackground(Color.GREEN);
+                            error.setText("H");
+                            display1.setText("");
+                            display2.setText(calculatorModel.displayZero());
+                            break;
+
+                        case "oneDecimal":
+                            calculatorModel.clear();
+                            calculatorModel.setPrecisionMode(CalculatorModel.PRECISION_0);
+                            calculatorModel.setOperationalMode(CalculatorModel.FLOAT_MODE);
+                            disableHexButtons();
+                            dotButton.setEnabled(true);
+                            resetErrorLabel();
+                            display1.setText("");
+                            display2.setText(calculatorModel.displayZero());
+                            break;
+
+                        case "twoDecimal":
+                            calculatorModel.clear();
+                            calculatorModel.setPrecisionMode(CalculatorModel.PRECISION_00);
+                            calculatorModel.setOperationalMode(CalculatorModel.FLOAT_MODE);
+                            disableHexButtons();
+                            dotButton.setEnabled(true);
+                            resetErrorLabel();
+                            display1.setText("");
+                            display2.setText(calculatorModel.displayZero());
+                            break;
+
+                        case "Sci":
+                            calculatorModel.clear();
+                            calculatorModel.setPrecisionMode(CalculatorModel.PRECISION_E);
+                            calculatorModel.setOperationalMode(CalculatorModel.FLOAT_MODE);
+                            disableHexButtons();
+                            dotButton.setEnabled(true);
+                            resetErrorLabel();
+                            display1.setText("");
+                            display2.setText(calculatorModel.displayZero());
+                            break;
+
+                        case "clear":
+                            display1.setText("");
+                            calculatorModel.clear();
+                            display2.setText(calculatorModel.displayZero());
+                            break;
+
+                        case ".":
+                            if (calculatorModel.getOperandFlag() == CalculatorModel.OPERAND1_FLAG) { // check which operand to add to
+                                calculatorModel.setOperand1(".");
+                                display2.setText(calculatorModel.getOperand1());
                             } else {
+                                calculatorModel.setOperand2(".");
                                 display2.setText(calculatorModel.getOperand2());
                             }
-                        }
-                        break;
-                    case "Hex":
-                        calculatorModel.clear();
-                        enableHexButtons();
-                        calculatorModel.setOperationalMode(CalculatorModel.INT_MODE); // set to integer calculations
-                        dotButton.setEnabled(false);
-                        error.setBackground(Color.GREEN);
-                        error.setText("H");
-                        display2.setText(calculatorModel.displayZero());
-                        break;
-                    case "oneDecimal":
-                        calculatorModel.clear();
-                        calculatorModel.setPrecisionMode(CalculatorModel.PRECISION_0);
-                        calculatorModel.setOperationalMode(CalculatorModel.FLOAT_MODE);
-                        disableHexButtons();
-                        dotButton.setEnabled(true);
-                        resetErrorLabel();
-                        display2.setText(calculatorModel.displayZero());
-                        break;
-                    case "twoDecimal":
-                        calculatorModel.clear();
-                        calculatorModel.setPrecisionMode(CalculatorModel.PRECISION_00);
-                        calculatorModel.setOperationalMode(CalculatorModel.FLOAT_MODE);
-                        disableHexButtons();
-                        dotButton.setEnabled(true);
-                        resetErrorLabel();
-                        display2.setText(calculatorModel.displayZero());
-                        break;
-                    case "Sci":
-                        calculatorModel.clear();
-                        calculatorModel.setPrecisionMode(CalculatorModel.PRECISION_E);
-                        calculatorModel.setOperationalMode(CalculatorModel.FLOAT_MODE);
-                        disableHexButtons();
-                        dotButton.setEnabled(true);
-                        resetErrorLabel();
-                        display2.setText(calculatorModel.displayZero());
-                        break;
-                    case "clear":
-                        display1.setText("");
-                        calculatorModel.clear();
-                        display2.setText(calculatorModel.displayZero());
-                        break;
-                    case ".":
-                        if(calculatorModel.getOperandFlag() == CalculatorModel.OPERAND1_FLAG){
-                            calculatorModel.setOperand1(".");
-                            display2.setText(calculatorModel.getOperand1());
-                        } else {
-                            calculatorModel.setOperand2(".");
-                            display2.setText(calculatorModel.getOperand2());
-                        }
-                        break;
-                    case "\u00B1":
-                        calculatorModel.toggleSign();
-                        if(calculatorModel.getOperandFlag() == CalculatorModel.OPERAND1_FLAG){
-                            if(calculatorModel.getOperand1().isEmpty()){
-                                display2.setText(calculatorModel.displayZero());
+                            break;
+
+                        case "\u00B1":
+                            calculatorModel.toggleSign();
+
+                            if (calculatorModel.getOperandFlag() == CalculatorModel.OPERAND1_FLAG) {
+                                if (calculatorModel.getOperand1().isEmpty()) {
+                                    display2.setText(calculatorModel.displayZero());
+                                }
+                                display2.setText(calculatorModel.getOperand1());
+                            } else {
+                                if (calculatorModel.getOperand2().isEmpty()) {
+                                    display2.setText(calculatorModel.displayZero());
+                                }
+                                display2.setText(calculatorModel.getOperand2());
                             }
-                            display2.setText(calculatorModel.getOperand1());
-                        } else {
-                            if(calculatorModel.getOperand2().isEmpty()){
-                                display2.setText(calculatorModel.displayZero());
+                            break;
+
+                        case "=":
+                            checkForShortcut();
+                            String result = calculatorModel.getResult();
+                            if (result != null) {
+                                display2.setText(result);
+                            } else {
+                                // if there is an error perform the following
+                                error.setBackground(Color.RED);
+                                error.setText("E");
+                                display2.setText(calculatorModel.getErrorMessage());
                             }
-                            display2.setText(calculatorModel.getOperand2());
-                        }
-                        break;
-                    case "=":
-                        checkForShortcut();
-                        String result = calculatorModel.getResult();
-                        if(result != null) {
-                            display2.setText(result);
-                        } else {
-                            error.setBackground(Color.RED);
-                            error.setText("E");
-                            display2.setText(calculatorModel.getErrorMessage());
-                        }
-                        display1.setText("");
-                        equalState = true;
-                        break;
+                            display1.setText(""); // clear the display1
+                            equalState = true; // flag the equal state to determine the following action
+                            break;
+                    }
                 }
             }
         }
@@ -459,7 +493,7 @@ public class CalculatorViewController extends JPanel {
          * @return boolean value
          */
         private boolean isArithmeticOperator(String value) {
-            if ("\u002B".equals(value) || "\u2212".equals(value) || "\u002A".equals(value) || "\u2215".equals(value)) {
+            if (PLUS_SYMBOL.equals(value) || MINUS_SYMBOL.equals(value) || MULTIPLY_SYMBOL.equals(value) || DIVIDE_SYMBOL.equals(value)) {
                 return true;
             }
             return false;
@@ -484,8 +518,13 @@ public class CalculatorViewController extends JPanel {
         }
 
         public void resetErrorLabel() {
-            error.setBackground(Color.YELLOW);
-            error.setText("F");
+            if(this.calculatorModel.getOperationalMode() == calculatorModel.INT_MODE){
+                error.setBackground(Color.GREEN);
+                error.setText("H");
+            } else {
+                error.setBackground(Color.YELLOW);
+                error.setText("F");
+            }
         }
 
         /**
@@ -513,14 +552,17 @@ public class CalculatorViewController extends JPanel {
             equalState = false;
         }
 
-        public void errorDisable() {
-            //if calculator is in hex mode disable hex buttons
-            if(calculatorModel.getOperationalMode() == calculatorModel.INT_MODE) {
-                for(JButton button : hexButtons) {
-                    button.setEnabled(false);
+        /**
+         * Will reset the error state of the calculator if the appropriate button is pressed.
+         * @param actionEvent the button clicked
+         */
+        public void resetError(String actionEvent) {
+            if(this.calculatorModel.getErrorState()) {
+                if("clear".equals(actionEvent) || "Hex".equals(actionEvent) || "oneDecimal".equals(actionEvent) || "twoDecimal".equals(actionEvent) || "Sci".equals(actionEvent)) {
+                    this.calculatorModel.setErrorState(false);
+                    resetErrorLabel();
                 }
             }
-
         }
     }
 }

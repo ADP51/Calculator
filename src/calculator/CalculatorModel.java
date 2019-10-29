@@ -20,10 +20,10 @@ public class CalculatorModel {
     public final static int PRECISION_0 = 0; //precision mode .0
     public final static int PRECISION_00 = 1; // precision mode .00
     public final static int PRECISION_E = 2; // precision mode Sci notation
-    public final static int FLOAT_MODE = 0;
-    public final static int INT_MODE = 1;
-    public final static int OPERAND1_FLAG = 0;
-    public final static int OPERAND2_FLAG = 1;
+    public final static int FLOAT_MODE = 0; // int value for Float mode
+    public final static int INT_MODE = 1; // int value for Hex mode
+    public final static int OPERAND1_FLAG = 0; // the flag value for the first operand
+    public final static int OPERAND2_FLAG = 1; // the flag value for the second operand
 
     private String[] formatModes = {"%.1f", "%.2f", "%E"}; // String formats for different precision modes
     private String operand1 = ""; // the first operand
@@ -47,9 +47,15 @@ public class CalculatorModel {
         }
     }
 
+    /**
+     * Performs all the calculations while the calculator is in Hex mode.
+     * @return the result of the calculation.
+     */
     private String calculateInteger() {
-        int op1 = 0;
-        int op2 = 0;
+        int op1; // place holder to convert the string operand1 tp perform calculation
+        int op2; // place holder to convert the string operand2 to perform calculation
+        int result; // temp field to hold the result of the calculation
+        String resultString; // virtual field to format the string result
 
         try {
             op1 = Integer.parseInt(operand1, 16);
@@ -78,18 +84,22 @@ public class CalculatorModel {
 
         try {
             switch (arithmeticOperation) {
-                case "\u002B":
-                    operand1 = Integer.toHexString(op1+op2).toUpperCase();
-                    return operand1;
-                case "\u2212":
-                    operand1 = Integer.toHexString(op1 - op2).toUpperCase();
-                    return operand1;
-                case "\u002A":
-                    operand1 = Integer.toHexString(op1 * op2).toUpperCase();
-                    return operand1;
-                case "\u2215":
-                    operand1 = Integer.toHexString(op1 / op2).toUpperCase();
-                    return operand1;
+                case CalculatorViewController.PLUS_SYMBOL:
+                    result = op1+op2;
+                    checkNegativeHexValue(result);
+                    break;
+                case CalculatorViewController.MINUS_SYMBOL:
+                    result = op1 - op2;
+                    checkNegativeHexValue(result);
+                    break;
+                case CalculatorViewController.MULTIPLY_SYMBOL:
+                    result = op1*op2;
+                    checkNegativeHexValue(result);
+                    break;
+                case CalculatorViewController.DIVIDE_SYMBOL:
+                    result = op1/op2;
+                    checkNegativeHexValue(result);
+                    break;
                 default:
                     this.errorState = true;
                     this.errorMessage = "Illegal arithmetic operator.";
@@ -100,12 +110,19 @@ public class CalculatorModel {
             this.errorMessage = "Unknown error";
             return null;
         }
+        resultString = operand1; // in order to return a virtual field
+        return resultString;
     }
 
+    /**
+     * Performs all the calculations while in Float mode.
+     * @return the result of the calculation
+     */
     private String calculateFloat() {
-        double op1 = 0;
-        double op2 = 0;
-        double result = 0;
+        double op1; // place holder to convert the string operand1 to perform calculation
+        double op2; // place holder to convert the string operand2 to perform calculation
+        double result = 0; // temp field to hold the result of the calculation
+        String resultString; // // virtual field to format the string result
         try {
             op1 = Double.parseDouble(operand1);
             op2 = Double.parseDouble(operand2);
@@ -134,18 +151,18 @@ public class CalculatorModel {
 
         try {
             switch (arithmeticOperation) {
-                case "\u002B":
+                case CalculatorViewController.PLUS_SYMBOL:
                     operand1 = String.format(formatModes[precisionMode], op1 + op2);
-                    return operand1;
-                case "\u2212":
+                    break;
+                case CalculatorViewController.MINUS_SYMBOL:
                     operand1 = String.format(formatModes[precisionMode], op1 - op2);
-                    return operand1;
-                case "\u002A":
+                    break;
+                case CalculatorViewController.MULTIPLY_SYMBOL:
                     operand1 = String.format(formatModes[precisionMode], op1 * op2);
-                    return operand1;
-                case "\u2215":
+                    break;
+                case CalculatorViewController.DIVIDE_SYMBOL:
                     operand1 = String.format(formatModes[precisionMode], op1 / op2);
-                    return operand1;
+                    break;
                 default:
                     this.errorState = true;
                     this.errorMessage = "Illegal arithmetic operator.";
@@ -156,6 +173,8 @@ public class CalculatorModel {
             this.errorMessage = "Unknown error";
             return null;
         }
+        resultString = operand1; // in order to return a virtual field
+        return resultString;
     }
 
     /**
@@ -172,14 +191,6 @@ public class CalculatorModel {
      */
     public int getOperandFlag() {
         return this.operandFlag;
-    }
-
-    /**
-     * Sets the operandFlag
-     * @param flagValue the new operandFlag value
-     */
-    public void setOperandFlag(int flagValue) {
-        this.operandFlag = flagValue;
     }
 
     /**
@@ -269,9 +280,6 @@ public class CalculatorModel {
      * @param operand the operand value
      */
     public void setOperand1(String operand) {
-        if("0".equals(this.operand1)){
-            operand1 = "";
-        }
         this.operand1 += operand;
     }
 
@@ -288,9 +296,6 @@ public class CalculatorModel {
      * @param operand the operand value
      */
     public void setOperand2(String operand) {
-        if("0".equals(this.operand2)){
-            operand2 = "";
-        }
         this.operand2 += operand;
     }
 
@@ -342,7 +347,39 @@ public class CalculatorModel {
         this.operand2 = "";
     }
 
+    /**
+     * Gets the current operational mode Float/Int
+     * @return the int value of operationalMode
+     */
     public int getOperationalMode() {
         return this.operationalMode;
+    }
+
+    /**
+     * Gets the error state of the calculator.
+     * @return true/false
+     */
+    public boolean getErrorState() {
+        return this.errorState;
+    }
+
+    /**
+     * Sets the error state to the boolean passed.
+     * @param errorState the new error state
+     */
+    public void setErrorState(boolean errorState) {
+        this.errorState = errorState;
+    }
+
+    /**
+     * Method to format hex return string. Checks for negative value and returns the correct value.
+     * @param result the calculated result
+     */
+    public void checkNegativeHexValue(int result) {
+        if(result < 0) {
+            operand1 = "-" + Math.abs(result);
+        } else {
+            operand1 = Integer.toHexString(result).toUpperCase();
+        }
     }
 }
